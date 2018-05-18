@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -19,17 +18,12 @@ type Response struct {
 
 type Routes []Route
 
+var clientMap map[string]Client
+
 var routes = Routes{
-	Route{"Test", "GET", "/test", http.HandlerFunc(TestRoute)},
-}
-
-func TestRoute(w http.ResponseWriter, r *http.Request) {
-	response := Response{
-		Message: "This is a test endpoint for Oregon Trail Go.",
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	Route{"Test", "GET", "/test", http.HandlerFunc(TestHandler)},
+	Route{"Register", "POST", "/register", http.HandlerFunc(RegisterClientHandler)},
+	Route{"GetUser", "GET", "/client/{clientid}", http.HandlerFunc(GetUserHandler)},
 }
 
 func NewRegisteredRouter() *mux.Router {
@@ -46,8 +40,8 @@ func NewRegisteredRouter() *mux.Router {
 
 func main() {
 
+	clientMap = make(map[string]Client)
 	router := NewRegisteredRouter()
-
 	http.ListenAndServe(":8080", router)
 
 }
