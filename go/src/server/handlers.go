@@ -32,6 +32,8 @@ func RegisterClientHandler(w http.ResponseWriter, r *http.Request) {
 	var newClient Client
 	newClient.Location = tmpClient.Location
 	newClient.Id = tmpClient.Id
+	newClient.IsAlive = true
+	newClient.Gold = 10
 	clientMap[newClient.Id] = newClient
 	response := Response{
 		Message: "Success",

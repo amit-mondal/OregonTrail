@@ -12,6 +12,8 @@ type Location struct {
 type Client struct {
 	Id       string   `json:"id"`
 	Location Location `json:"location"`
+	IsAlive  bool     `json:"is_alive"`
+	Gold     int      `json:"gold"`
 }
 
 func Delta(l1 *Location, l2 *Location) float64 {
