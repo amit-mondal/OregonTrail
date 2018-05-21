@@ -33,7 +33,13 @@ func RegisterClientHandler(w http.ResponseWriter, r *http.Request) {
 	newClient.Location = tmpClient.Location
 	newClient.Id = tmpClient.Id
 	newClient.IsAlive = true
+	/*Give random starting values, can be changed as seen fit*/
 	newClient.Gold = 10
+	newClient.Water = 2
+	newClient.Food = 5
+	newClient.Parts = 1
+	newClient.Bullets = 10
+	newClient.Medicine = 2
 	clientMap[newClient.Id] = newClient
 	response := Response{
 		Message: "Success",
