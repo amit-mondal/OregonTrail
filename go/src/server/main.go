@@ -19,11 +19,14 @@ type Response struct {
 type Routes []Route
 
 var clientMap map[string]Client
+var lastLocation Location
+var state State
 
 var routes = Routes{
 	Route{"Test", "GET", "/test", http.HandlerFunc(TestHandler)},
 	Route{"Register", "POST", "/register", http.HandlerFunc(RegisterClientHandler)},
 	Route{"GetUser", "GET", "/client/{clientid}", http.HandlerFunc(GetUserHandler)},
+	Route{"StartGame", "GET", "/start", http.HandlerFunc(StartGameHandler)},
 }
 
 func NewRegisteredRouter() *mux.Router {
@@ -41,6 +44,7 @@ func NewRegisteredRouter() *mux.Router {
 func main() {
 
 	clientMap = make(map[string]Client)
+	state = WaitForGameStart
 	router := NewRegisteredRouter()
 	http.ListenAndServe(":8080", router)
 
