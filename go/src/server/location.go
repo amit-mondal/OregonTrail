@@ -7,11 +7,12 @@ import (
 // All location constants in meters
 const (
 	EventDistance float64 = 10
+	GameDistance  float64 = 200
 )
 
 type Location struct {
-	Lat float64 `json:",string"`
-	Lon float64 `json:",string"`
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lon"`
 }
 
 // haversin(θ) function
@@ -54,8 +55,10 @@ func UpdateLocation() bool {
 		return true
 	}
 	// Otherwise, check if they've travelled far enough
-	if Delta(currAvgLocation, lastEventLocation) >= EventDistance {
+	dist := Delta(currAvgLocation, lastEventLocation)
+	if dist >= EventDistance {
 		lastEventLocation = currAvgLocation
+		distanceTravelled += dist
 		return true
 	}
 	// Otherwise don't update the event location and return false

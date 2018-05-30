@@ -22,6 +22,7 @@ type Routes []Route
 
 var clientMap map[string]*Client
 var lastEventLocation, currAvgLocation Location
+var distanceTravelled float64
 var state State
 var pendingEvent Event
 var eventClientId string
@@ -32,6 +33,7 @@ var routes = Routes{
 	Route{"GetUser", "GET", "/client/{clientid}", http.HandlerFunc(GetUserHandler)},
 	Route{"StartGame", "GET", "/start", http.HandlerFunc(StartGameHandler)},
 	Route{"CheckIn", "POST", "/checkin", http.HandlerFunc(CheckInHandler)},
+	Route{"Respond", "GET", "/respond/{clientid}", http.HandlerFunc(RespondHandler)},
 }
 
 func NewRegisteredRouter() *mux.Router {
@@ -51,6 +53,7 @@ func main() {
 	// We want a nice random seed
 	rand.Seed(time.Now().UTC().UnixNano())
 	pendingEvent = None
+	distanceTravelled = 0
 	clientMap = make(map[string]*Client)
 	state = WaitForGameStart
 	router := NewRegisteredRouter()

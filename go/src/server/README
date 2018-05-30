@@ -1,0 +1,51 @@
+
+Basic Server Functionality:
+
+Clients should register prior to game start with a POST to /register
+Here is a sample JSON:
+
+{  
+   "id":"bill",
+   "location":{  
+      "lat":1.1,
+      "lon":2.1
+   }
+}
+
+IMPORTANT: Note that lat and lon fields are no longer strings
+The response code should be 200 if successful
+
+Once all clients are registered, a GET to /start will start the game.
+
+Once the game is started, clients can POST to /checkin with the same kind of JSON they used to register.
+A response from checkin will look like this:
+
+{  
+   "percent_complete":0,
+   "event":-1,
+   "event_client":"",
+   "client":{  
+      "id":"bill",
+      "location":{  
+         "lat":1.1,
+         "lon":2.1
+      },
+      "is_alive":false,
+      "food":5,
+      "water":2,
+      "bullets":10,
+      "supplies":5
+   }
+}
+
+The first field is the percent of the game the party has completed.
+The second is the event ID. Check events.go to see which event ID corresponds to which event. An event ID of -1 means there is no event.
+The third is the ID of the client to whom the event will occur. All events affect one client except for visiting a town, which affects all clients.
+The fourth is simply the client's information.
+
+THe client should keep checking in periodically (about once every 2 or 3 seconds) until an event occurs.
+Once an event occurs, the client should serve the event to the user and give them the chance to respond. Clients can no longer check in while there
+is a pending event.
+
+The first client to send a GET to /respond/{clientid} will be the responder to the event. Once the event has been responded to by a client, checking in
+will work as normal. Thus, every client should keep trying to check in during the event to see if another client has already responded to the event.

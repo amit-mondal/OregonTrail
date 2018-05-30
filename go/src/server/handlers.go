@@ -13,15 +13,19 @@ func LogBadRequest(w http.ResponseWriter, s string) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func TestHandler(w http.ResponseWriter, r *http.Request) {
+func WriteMessage(w http.ResponseWriter, s string) {
 	response := Response{
-		Message: "This is a test endpoint for Oregon Trail Go.",
+		Message: s,
 	}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+}
+
+func TestHandler(w http.ResponseWriter, r *http.Request) {
+	WriteMessage(w, "This is a test endpoint for Oregon Trail Go")
 }
 
 func RegisterClientHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,14 +50,7 @@ func RegisterClientHandler(w http.ResponseWriter, r *http.Request) {
 		newClient.Supplies = 5
 		newClient.State = WillCheckIn
 		clientMap[newClient.Id] = &newClient
-		response := Response{
-			Message: "Success",
-		}
-		if err := json.NewEncoder(w).Encode(response); err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		WriteMessage(w, "Success")
 		fmt.Printf("Client %s registered\n", newClient.Id)
 	} else {
 		LogBadRequest(w, "Attempted to add during game start")
@@ -75,14 +72,7 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	if state == WaitForGameStart {
-		response := Response{
-			Message: "Success",
-		}
-		if err := json.NewEncoder(w).Encode(response); err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		WriteMessage(w, "Success")
 		state = WaitForCheckIn
 		fmt.Println("Started Game")
 	} else {
@@ -117,16 +107,18 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Struct defining response format
 	var checkInResponse struct {
-		Event         Event  `json:"event"`
-		EventClientId string `json:"event_client"`
-		Client        Client `json:"client"`
+		PercentComplete float64 `json:"percent_complete"`
+		Event           Event   `json:"event"`
+		EventClientId   string  `json:"event_client"`
+		Client          Client  `json:"client"`
 	}
 	// Defaults to 0, so make sure to set to None (-1)
 	checkInResponse.Event = None
+	checkInResponse.PercentComplete = distanceTravelled / GameDistance
 
 	switch state {
 	case WaitForGameStart:
-		LogBadRequest(w, "Game already started")
+		LogBadRequest(w, "Cannot check in until game is started")
 	case WaitForCheckIn:
 
 		if AllClientState(HasCheckedIn) {
@@ -176,9 +168,24 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 		if AllClientState(HasReceived) {
 			fmt.Println("All clients received event")
 			SetAllClientState(WillMakeDecision)
+			state = WaitForDecision
 			return
 		}
 
 	case WaitForDecision:
+		WriteMessage(w, "Waiting for response to pending event")
+	}
+}
+
+func RespondHandler(w http.ResponseWriter, r *http.Request) {
+	if state == WaitForDecision {
+		state = WaitForCheckIn
+		SetAllClientState(WillCheckIn)
+		// TODO: Do something else here to handle client response.
+		fmt.Println("Client responded to event")
+		pendingEvent = None
+	} else {
+		LogBadRequest(w, "Client attempted to respond while there was no open event - another client may have already responded, or not every client has received the event")
+		WriteMessage(w, "No open event to respond to - another client may have already responded, or no every client has received the event")
 	}
 }
