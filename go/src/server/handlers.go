@@ -6,10 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
-
-//BadGrass count for events
-var BadGrass int
 
 func LogBadRequest(w http.ResponseWriter, s string) {
 	fmt.Printf("ERR: %s\n", s)
@@ -78,8 +76,6 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 		WriteMessage(w, "Success")
 		state = WaitForCheckIn
 		fmt.Println("Started Game")
-		//Also set the BadGrass to 0
-		BadGrass = 0
 	} else {
 		LogBadRequest(w, "Game already started")
 	}
@@ -134,7 +130,7 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 				pendingEvent = RandomEvent()
 				eventClientId = RandomClient()
 				fmt.Printf("Event %d selected\n", pendingEvent)
-				DoEvent(pendingEvent, eventClientId)
+				//DoEvent(pendingEvent, eventClientId)
 			} else {
 				SetAllClientState(WillCheckIn)
 				pendingEvent = None
@@ -169,6 +165,7 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		client.State = HasReceived
+		fmt.Printf("Client %s has received the event\n", client.Id)
 		// If that was the last client to receive, move to the next state
 		if AllClientState(HasReceived) {
 			fmt.Println("All clients received event")
@@ -184,18 +181,19 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 
 func RespondHandler(w http.ResponseWriter, r *http.Request) {
 	if state == WaitForDecision {
-		vars := mux.Vars()
+		vars := mux.Vars(r)
 		//respondingClient := clientMap[vars["clientid"]]
 		action := vars["action"]
-		// TODO: Do something else here to handle client response.
+		//Do something here to handle client response.
+
 		if action == "true" {
-			valid := DoEvent(pendingEvent, vars["clientid"])
+			valid := DoEvent(w, pendingEvent, vars["clientid"])
 			if !valid {
 				//Don't change the state, so just return
 				return
 			}
 		} else {
-			IgnoreEvent(pendingEvent, vars["clientid"])
+			IgnoreEvent(w, pendingEvent, vars["clientid"])
 		}
 		state = WaitForCheckIn
 		SetAllClientState(WillCheckIn)
@@ -203,6 +201,26 @@ func RespondHandler(w http.ResponseWriter, r *http.Request) {
 		pendingEvent = None
 	} else {
 		LogBadRequest(w, "Client attempted to respond while there was no open event - another client may have already responded, or not every client has received the event")
-		WriteMessage(w, "No open event to respond to - another client may have already responded, or no every client has received the event")
+		WriteMessage(w, "No open event to respond to - another client may have already responded, or not every client has received the event")
+	}
+}
+
+func EventHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	action := vars["action"]
+	eventNum, err := strconv.Atoi(vars["eventNum"])
+	if err != nil {
+		fmt.Printf("Atoi error")
+	}
+	pendingEvent = Event(eventNum)
+	eventClientId = RandomClient()
+	if action == "true" {
+		valid := DoEvent(w, pendingEvent, vars["clientid"])
+		if !valid {
+			//Don't change the state, so just return
+			return
+		}
+	} else {
+		IgnoreEvent(w, pendingEvent, vars["clientid"])
 	}
 }

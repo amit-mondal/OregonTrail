@@ -34,6 +34,7 @@ var routes = Routes{
 	Route{"StartGame", "GET", "/start", http.HandlerFunc(StartGameHandler)},
 	Route{"CheckIn", "POST", "/checkin", http.HandlerFunc(CheckInHandler)},
 	Route{"Respond", "GET", "/respond/{clientid}/{action}", http.HandlerFunc(RespondHandler)},
+	Route{"eventTest", "Get", "/eventTest/{clientid}/{action}/{eventNum}", http.HandlerFunc(EventHandler)},
 }
 
 func NewRegisteredRouter() *mux.Router {

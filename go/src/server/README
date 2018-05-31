@@ -47,5 +47,13 @@ THe client should keep checking in periodically (about once every 2 or 3 seconds
 Once an event occurs, the client should serve the event to the user and give them the chance to respond. Clients can no longer check in while there
 is a pending event.
 
+When an event occurs, every event should be answered in one of two ways: "true" or "false", sent in as a string. The server accepts the first response as
+the final response. "true" (no captials) means that the responder wants to act on the event by providing their item to complete the event. Client should
+receive a message as to the outcome of the event. "false" means the client chooses to ignore the event (not use an item) and let the event play through.
+Only the client who responded first will get the outcome message written to their screen. Currently, dead players can still respond, that will be
+changed shortly (so ignore that, functionality still works). If a client attempts to respond with "true" while they don't have the necessary item, the
+server will say you don't have X, and will continue to wait for a different client to respond "true" or for the first "false". Game will not progress
+if no proper input is given. 
+
 The first client to send a GET to /respond/{clientid} will be the responder to the event. Once the event has been responded to by a client, checking in
 will work as normal. Thus, every client should keep trying to check in during the event to see if another client has already responded to the event.
