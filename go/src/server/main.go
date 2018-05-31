@@ -24,8 +24,8 @@ var clientMap map[string]*Client
 var lastEventLocation, currAvgLocation Location
 var distanceTravelled float64
 var state State
-var pendingEvent Event
-var eventClientId string
+var pendingEvent Event   // The event that's occuring
+var eventClientId string // The client to whom the event is occurring
 
 var routes = Routes{
 	Route{"Test", "GET", "/test", http.HandlerFunc(TestHandler)},
@@ -33,7 +33,7 @@ var routes = Routes{
 	Route{"GetUser", "GET", "/client/{clientid}", http.HandlerFunc(GetUserHandler)},
 	Route{"StartGame", "GET", "/start", http.HandlerFunc(StartGameHandler)},
 	Route{"CheckIn", "POST", "/checkin", http.HandlerFunc(CheckInHandler)},
-	Route{"Respond", "GET", "/respond/{clientid}", http.HandlerFunc(RespondHandler)},
+	Route{"Respond", "GET", "/respond/{clientid}/{action}", http.HandlerFunc(RespondHandler)},
 }
 
 func NewRegisteredRouter() *mux.Router {
