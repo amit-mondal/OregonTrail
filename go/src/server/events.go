@@ -54,6 +54,7 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Client doesn't have enough bullets, so return false and do nothing
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough bullets.")
 			return false
 		}
@@ -70,6 +71,7 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Not enough water
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough water.")
 			return false
 		}
@@ -81,6 +83,7 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Not enough supplies
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough supplies.")
 			return false
 		}
@@ -97,6 +100,7 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Not enough food
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough food.")
 			return false
 		}
@@ -127,6 +131,7 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Not enough supplies
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough supplies.")
 			return false
 		}
@@ -143,10 +148,12 @@ func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
 			return true
 		} else {
 			//Not enough bullets
+			w.WriteHeader(http.StatusBadRequest)
 			WriteMessage(w, "You do not have enough bullets.")
 			return false
 		}
 	default:
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Printf("Event %d not handled\n", event)
 		return false
 	}

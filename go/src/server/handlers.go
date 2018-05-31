@@ -108,6 +108,7 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Struct defining response format
 	var checkInResponse struct {
+		GameOver        bool    `json:"game_over"`
 		PercentComplete float64 `json:"percent_complete"`
 		Event           Event   `json:"event"`
 		EventClientId   string  `json:"event_client"`
@@ -116,6 +117,7 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 	// Defaults to 0, so make sure to set to None (-1)
 	checkInResponse.Event = None
 	checkInResponse.PercentComplete = distanceTravelled / GameDistance
+	checkInResponse.GameOver = NumLivingClients() == 0
 
 	switch state {
 	case WaitForGameStart:
@@ -182,23 +184,30 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 func RespondHandler(w http.ResponseWriter, r *http.Request) {
 	if state == WaitForDecision {
 		vars := mux.Vars(r)
-		//respondingClient := clientMap[vars["clientid"]]
+		respondingClient := clientMap[vars["clientid"]]
 		action := vars["action"]
 		//Do something here to handle client response.
-
 		if action == "true" {
 			valid := DoEvent(w, pendingEvent, vars["clientid"])
 			if !valid {
 				//Don't change the state, so just return
 				return
 			}
+			state = WaitForCheckIn
+			SetAllClientState(WillCheckIn)
+			fmt.Println("Client responded 'true' to event")
+			pendingEvent = None
 		} else {
-			IgnoreEvent(w, pendingEvent, vars["clientid"])
+			respondingClient.State = HasMadeDecision
+			fmt.Println("Client responded 'false' to event")
+			if AllClientState(HasMadeDecision) {
+				IgnoreEvent(w, pendingEvent, vars["clientid"])
+				state = WaitForCheckIn
+				SetAllClientState(WillCheckIn)
+				fmt.Println("All clients responded 'false' to event")
+				pendingEvent = None
+			}
 		}
-		state = WaitForCheckIn
-		SetAllClientState(WillCheckIn)
-		fmt.Println("Client responded to event")
-		pendingEvent = None
 	} else {
 		LogBadRequest(w, "Client attempted to respond while there was no open event - another client may have already responded, or not every client has received the event")
 		WriteMessage(w, "No open event to respond to - another client may have already responded, or not every client has received the event")
