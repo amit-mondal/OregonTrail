@@ -73,12 +73,10 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	if state == WaitForGameStart {
-		WriteMessage(w, "Success")
 		state = WaitForCheckIn
 		fmt.Println("Started Game")
-	} else {
-		LogBadRequest(w, "Game already started")
 	}
+	WriteMessage(w, "Success")
 }
 
 func CheckInHandler(w http.ResponseWriter, r *http.Request) {
