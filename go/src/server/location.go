@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -59,6 +60,7 @@ func UpdateLocation() bool {
 	if dist >= EventDistance {
 		lastEventLocation = currAvgLocation
 		distanceTravelled += dist
+		fmt.Printf("Distance travelled: %d", distanceTravelled)
 		return true
 	}
 	// Otherwise don't update the event location and return false
