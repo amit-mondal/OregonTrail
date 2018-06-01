@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 )
@@ -44,11 +45,11 @@ func RegisterClientHandler(w http.ResponseWriter, r *http.Request) {
 		newClient.Location = tmpClient.Location
 		newClient.Id = tmpClient.Id
 		newClient.IsAlive = true
-		/*Give random starting values, can be changed as seen fit*/
-		newClient.Water = 2
-		newClient.Food = 5
-		newClient.Bullets = 10
-		newClient.Supplies = 5
+		/*Give random starting values between 3-6*/
+		newClient.Water = rand.Intn(4) + 3
+		newClient.Food = rand.Intn(4) + 3
+		newClient.Bullets = rand.Intn(4) + 3
+		newClient.Supplies = rand.Intn(4) + 3
 		newClient.State = WillCheckIn
 		clientMap[newClient.Id] = &newClient
 		WriteMessage(w, "Success")
