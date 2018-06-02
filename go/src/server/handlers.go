@@ -138,10 +138,12 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			// Not every client has checked in yet, so just record its location.
-			client.State = HasCheckedIn
-			currAvgLocation.Lat += clientInfo.Location.Lat
-			currAvgLocation.Lon += clientInfo.Location.Lon
-			fmt.Printf("Client %s has checked in\n", client.Id)
+			if client.State != HasCheckedIn {
+				client.State = HasCheckedIn
+				currAvgLocation.Lat += clientInfo.Location.Lat
+				currAvgLocation.Lon += clientInfo.Location.Lon
+				fmt.Printf("Client %s has checked in (Lat: %d, Lon: %d)\n", client.Id, clientInfo.Location.Lat, clientInfo.Location.Lon)
+			}
 		}
 
 		// Whenever a client checks in during this state, we simply echo back the client
@@ -199,7 +201,7 @@ func RespondHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			respondingClient.State = HasMadeDecision
 			fmt.Println("Client responded 'false' to event")
-			if AllClientState(HasMadeDecision) {
+			if AllLivingClientState(HasMadeDecision) {
 				IgnoreEvent(w, pendingEvent, vars["clientid"])
 				state = WaitForCheckIn
 				SetAllClientState(WillCheckIn)

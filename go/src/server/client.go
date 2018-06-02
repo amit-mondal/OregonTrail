@@ -42,6 +42,15 @@ func AllClientState(clientState ClientState) bool {
 	return true
 }
 
+func AllLivingClientState(clientState ClientState) bool {
+	for _, value := range clientMap {
+		if value.IsAlive && value.State != clientState {
+			return false
+		}
+	}
+	return true
+}
+
 func NumLivingClients() int {
 	var numAlive int
 	for _, client := range clientMap {

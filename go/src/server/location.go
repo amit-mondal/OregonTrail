@@ -48,8 +48,11 @@ func UpdateLocation() bool {
 
 	// Divide summed location by number of clients to get average location
 	numClients := float64(len(clientMap))
+
+	fmt.Printf("Summed Lat: %d, Lon: %d, numClients: %d\n", currAvgLocation.Lat, currAvgLocation.Lon, numClients)
 	currAvgLocation.Lat /= numClients
 	currAvgLocation.Lon /= numClients
+	fmt.Printf("Avgd Lat: %d, Lon: %d\n", currAvgLocation.Lat, currAvgLocation.Lon)
 	// If it's empty then use it
 	if (Location{}) == lastEventLocation {
 		lastEventLocation = currAvgLocation
@@ -57,10 +60,11 @@ func UpdateLocation() bool {
 	}
 	// Otherwise, check if they've travelled far enough
 	dist := Delta(currAvgLocation, lastEventLocation)
+	fmt.Printf("Distance from current to last loc: %d\n", dist)
 	if dist >= EventDistance {
 		lastEventLocation = currAvgLocation
 		distanceTravelled += dist
-		fmt.Printf("Distance travelled: %d", distanceTravelled)
+		fmt.Printf("Distance travelled: %d\n", distanceTravelled)
 		return true
 	}
 	// Otherwise don't update the event location and return false
