@@ -207,6 +207,8 @@ func RespondHandler(w http.ResponseWriter, r *http.Request) {
 				SetAllClientState(WillCheckIn)
 				fmt.Println("All clients responded 'false' to event")
 				pendingEvent = None
+			} else {
+				WriteMessage(w, "Waiting for party to arrive at a decision")
 			}
 		}
 	} else {
