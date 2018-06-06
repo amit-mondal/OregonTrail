@@ -26,7 +26,7 @@ const (
 )
 
 func RandomEvent() Event {
-	return Event(rand.Intn(NumEvents - 1)) // Should never give us "None"
+	return Event(rand.Intn(NumEvents)) // Should never give us "None"
 }
 
 func DoEvent(w http.ResponseWriter, event Event, clientId string) bool {
@@ -245,5 +245,5 @@ func IgnoreEvent(w http.ResponseWriter, event Event, clientId string) {
 }
 
 func CheckForEvent() bool {
-	return (rand.Intn(EventChance-1) == 0)
+	return true
 }

@@ -68,7 +68,7 @@ func RandomClient() string {
 		randNum = 0
 	} else {
 		// Intn panics when you give it 0 as an arg
-		randNum = rand.Intn(numAlive - 1)
+		randNum = rand.Intn(numAlive)
 	}
 	ctr := 0
 	for key, client := range clientMap {

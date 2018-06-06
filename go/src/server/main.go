@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -26,6 +27,7 @@ var distanceTravelled float64
 var state State
 var pendingEvent Event   // The event that's occuring
 var eventClientId string // The client to whom the event is occurring
+var mutex *sync.Mutex
 
 var routes = Routes{
 	Route{"Test", "GET", "/test", http.HandlerFunc(TestHandler)},
@@ -53,6 +55,7 @@ func main() {
 
 	// We want a nice random seed
 	rand.Seed(time.Now().UTC().UnixNano())
+	mutex = &sync.Mutex{}
 	pendingEvent = None
 	distanceTravelled = 0
 	clientMap = make(map[string]*Client)

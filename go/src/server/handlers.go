@@ -81,7 +81,8 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckInHandler(w http.ResponseWriter, r *http.Request) {
-
+	mutex.Lock()
+	defer mutex.Unlock()
 	// First decode into a temp struct
 	var clientInfo struct {
 		Id       string   `json:"id"`
@@ -183,6 +184,8 @@ func CheckInHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RespondHandler(w http.ResponseWriter, r *http.Request) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	if state == WaitForDecision {
 		vars := mux.Vars(r)
 		respondingClient := clientMap[vars["clientid"]]
